@@ -6,7 +6,7 @@ Date: 2017/05
 #define __APPLICATIONCLASS_H_
 
 #include "Definitions.h"
-
+#include "vector"
 #include "ControllerConfiguration.h"
 #include "imgui\ImGuiObject.h"
 
@@ -14,7 +14,9 @@ Date: 2017/05
 
 class Application
 {
-	MyMesh* m_pMesh = nullptr;
+	//MyMesh* m_pMesh = nullptr;
+	std::vector<MyMesh*> meshes;
+	std::vector<vector3> translation;
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 
 private:
