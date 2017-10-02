@@ -128,7 +128,10 @@ void Application::Display(void)
 }
 void Application::Release(void)
 {
-	//SafeDelete(mesh);
+	//SafeDelete(MyMesh*);
+	for (int i = 0; i < 51; ++i) {
+		SafeDelete(meshes[i]);
+	}
 
 	//release GUI
 	ShutdownGUI();

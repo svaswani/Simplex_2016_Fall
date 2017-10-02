@@ -12,6 +12,7 @@ void Application::InitVariables(void)
 
 	m_pModel = new Simplex::Model();
 	m_pModel->Load("Sorted\\WallEye.bto");
+
 	
 	m_stopsList.push_back(vector3(-4.0f, -2.0f, 5.0f));
 	m_stopsList.push_back(vector3(1.0f, -2.0f, 5.0f));
@@ -29,6 +30,7 @@ void Application::InitVariables(void)
 	m_stopsList.push_back(vector3(5.0f, 2.0f, -5.0f));
 
 	m_stopsList.push_back(vector3(1.0f, 3.0f, -5.0f));
+
 }
 void Application::Update(void)
 {
@@ -40,6 +42,8 @@ void Application::Update(void)
 
 	//Is the first person camera active?
 	CameraRotation();
+
+
 }
 void Application::Display(void)
 {
@@ -54,19 +58,14 @@ void Application::Display(void)
 	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
+
 	//calculate the current position
 	vector3 v3CurrentPos;
-	
-
-
 
 
 	//your code goes here
 	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
 	//-------------------
-	
-
-
 	
 	matrix4 m4Model = glm::translate(v3CurrentPos);
 	m_pModel->SetModelMatrix(m4Model);
@@ -79,7 +78,29 @@ void Application::Display(void)
 	{
 		m_pMeshMngr->AddSphereToRenderList(glm::translate(m_stopsList[i]) * glm::scale(vector3(0.05f)), C_GREEN, RENDER_WIRE);
 	}
-	
+
+	static int prevStop = 0;
+	static int nextStop = 1;
+	if (fTimer >= 1.0) {
+		prevStop++;
+		nextStop++;
+		if (nextStop >= m_stopsList.size())
+			nextStop = 0;
+		if (prevStop >= m_stopsList.size())
+			prevStop = 0;
+	}
+
+	if (fTimer > 1.0f) {
+		fTimer = 0.0f;
+	}
+
+	// lerping
+	matrix4 m4WallEye;
+	vector3 v3LerpVector = glm::lerp(m_stopsList[prevStop], m_stopsList[nextStop], fTimer); // gets to each point in 1 second
+	m4WallEye = glm::translate(v3LerpVector);
+	m_pModel->SetModelMatrix(m4WallEye);
+
+
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
 	
