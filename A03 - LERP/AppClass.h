@@ -6,7 +6,7 @@ Date: 2017/05
 #define __APPLICATIONCLASS_H_
 
 //#include <vld.h>
-
+#include "vector"
 #include "MyMesh.h"
 
 #include "SFML\Window.hpp"
@@ -18,9 +18,14 @@ Date: 2017/05
 
 class Application
 {
+	// a vector3 that can take care of all points/stops needed
+	std::vector<std::vector<vector3>> points;
+	// a vector that can take care of what side the sphere will pass through next
+	std::vector<float> sides;
+
 	uint m_uOrbits = 0; //number of shapes starting at 3 and increasing in sides
 	std::vector<uint> m_shapeList; //shape index for circles
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	String m_sProgrammer = "Sneha Vaswani - sxv6374@rit.edu";
 	
 private:
 	static ImGuiObject gui; //GUI object
