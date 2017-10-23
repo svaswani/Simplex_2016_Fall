@@ -14,8 +14,10 @@ Date: 2017/05
 
 class Application
 {
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	String m_sProgrammer = "Sneha Vaswani - sxv6374@rit.edu";
 	MyMesh* m_pMesh = nullptr;
+	vector3 m_v3Rot = vector3(.0f, .0f, .0f);
+	quaternion myQuaternion;
 
 private:
 	static ImGuiObject gui; //GUI object
