@@ -56,22 +56,43 @@ void Application::Display(void)
 		m_pCamera->ResetCamera();
 		break;
 	case 2:
+		// case 2 is an ortho perspective 
 		m_pCamera->ResetCamera();
+		//m_pCamera->SetPositionTargetAndUp();
+		m_pCamera->SetPerspective(false);
 		break;
 	case 3:
+		// case 3 changes the position and moves the camera down
+		// it also changes the target's x value
+		// it looks upward in the z element
 		m_pCamera->ResetCamera();
+		// set position target and up takes in 3 vector 3's of position, target, and upward
+		m_pCamera->SetPositionTargetAndUp(vector3(37.0f, 0.0f, 0.0f), vector3(32.0f, 0.0f, 0.0f), vector3(0.0f, 0.0f, -1.0f));
 		break;
 	case 4:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPositionTargetAndUp(vector3(0.0f, 0.0f, -16.0f), vector3(0.0f, 0.0f, -13.0f), vector3(0.0f, 1.0f, 0.0f));
 		break;
 	case 5:
 		m_pCamera->ResetCamera();
+		// same as case 4 position/target/up
+		m_pCamera->SetPositionTargetAndUp(vector3(0.0f, 0.0f, -16.0f), vector3(0.0f, 0.0f, -13.0f), vector3(0.0f, 1.0f, 0.0f));
+		// but you need to add a near far 
+		m_pCamera->SetNearFar(vector2(6.0f, 100.0f));
 		break;
 	case 6:
 		m_pCamera->ResetCamera();
+		// same as case 4 again
+		m_pCamera->SetPositionTargetAndUp(vector3(0.0f, 0.0f, -16.0f), vector3(0.0f, 0.0f, -13.0f), vector3(0.0f, 1.0f, 0.0f));
+		// this time you need a near far vector2 further back
+		m_pCamera->SetNearFar(vector2(1.1f, 12.0f));
 		break;
 	case 7:
 		m_pCamera->ResetCamera();
+		// for this one you just need to flip the camera's y 
+		//m_pCamera->SetPositionTargetAndUp(vector3(0.0f, -1.0f, 0.0f), vector3(0.0f, 0.0f, 0.0f), vector3(0.0f, 0.0f, 0.0f));
+		//m_pCamera->SetPosition(vector3(0.0f, -1.0f, 0.0f));
+		m_pCamera->SetUp(vector3(0.0f, -1.0f, 0.0f));
 		break;
 	}
 
