@@ -12,6 +12,10 @@ namespace Simplex
 
 class MyCamera
 {
+	matrix4 rotationPitchYaw = IDENTITY_M4;
+	matrix4 rotationYaw = IDENTITY_M4;
+	matrix4 rotationRoll = IDENTITY_M4;
+
 	vector3 m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Up = vector3(0.0f, 1.0f, 0.0f); //What is up
@@ -211,6 +215,10 @@ public:
 	OUTPUT: ---
 	*/
 	void CalculateProjectionMatrix(void);
+		  
+		   void ChangePitchYaw(float a_fDegree, float a_fDegree2);
+		   void ChangeYaw(float a_fDegree);
+		   void ChangeRoll(float a_fDegree);
 };
 
 } //namespace Simplex

@@ -2,6 +2,46 @@
 using namespace Simplex;
 
 //Accessors
+
+// getters  
+
+// get up
+vector3 Simplex::MyCamera::GetUp(void)
+{
+	return glm::normalize(m_v3Up);
+}
+
+// get position
+vector3 Simplex::MyCamera::GetPosition(void) 
+{ 
+	return m_v3Position; 
+}
+
+// get target 
+vector3 Simplex::MyCamera::GetTarget(void) 
+{ 
+	return m_v3Target; 
+}
+
+void MyCamera::ChangePitchYaw(float a_fDegree, float a_fDegree2)
+{
+	//Code removed for assignment purposes
+	//rotationPitch = a_fDegree;
+	rotationPitchYaw = glm::yawPitchRoll(a_fDegree2, a_fDegree, 0.0f);
+	//this->m_v3Target =  ;
+}
+
+void MyCamera::ChangeYaw(float a_fDegree)
+{
+	//Code removed for assignment purposes
+}
+
+void MyCamera::ChangeRoll(float a_fDegree)
+{
+	//Code removed for assignment purposes
+}
+
+
 void Simplex::MyCamera::SetPosition(vector3 a_v3Position) { m_v3Position = a_v3Position; }
 
 void Simplex::MyCamera::SetTarget(vector3 a_v3Target) { m_v3Target = a_v3Target; }
@@ -37,6 +77,7 @@ Simplex::MyCamera::MyCamera(vector3 a_v3Position, vector3 a_v3Target, vector3 a_
 
 Simplex::MyCamera::MyCamera(MyCamera const& other)
 {
+	// return these in the getters above 
 	m_v3Position = other.m_v3Position;
 	m_v3Target = other.m_v3Target;
 	m_v3Up = other.m_v3Up;
@@ -137,6 +178,7 @@ void Simplex::MyCamera::CalculateViewMatrix(void)
 {
 	//Calculate the look at
 	m_m4View = glm::lookAt(m_v3Position, m_v3Target, m_v3Up);
+	m_m4View = rotationPitchYaw * m_m4View;
 }
 
 void Simplex::MyCamera::CalculateProjectionMatrix(void)

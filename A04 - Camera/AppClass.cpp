@@ -28,6 +28,10 @@ void Application::Update(void)
 	//Update the system so it knows how much time has passed since the last call
 	m_pSystem->Update();
 
+	if (gui.m_bMousePressed[2] = true) {
+
+	}
+
 	//Is the arcball active?
 	ArcBall();
 

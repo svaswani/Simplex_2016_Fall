@@ -32,6 +32,7 @@ void Application::ProcessMousePressed(sf::Event a_event)
 
 	for (int i = 0; i < 3; i++)
 		gui.io.MouseDown[i] = gui.m_bMousePressed[i];
+
 }
 void Application::ProcessMouseReleased(sf::Event a_event)
 {
@@ -344,8 +345,8 @@ void Application::CameraRotation(float a_fSpeed)
 	MouseY = pt.y;
 
 	//Calculate the difference in view with the angle
-	float fAngleX = 0.0f;
-	float fAngleY = 0.0f;
+	static float fAngleX = 0.0f;
+	static float fAngleY = 0.0f;
 	float fDeltaMouse = 0.0f;
 	if (MouseX < CenterX)
 	{
@@ -369,7 +370,19 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
+
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
+	if (gui.m_bMousePressed[2] == true) {
+
+		m_pCamera->ChangePitchYaw(fAngleX, fAngleY);
+		//m_pCamera->ChangeYaw(fAngleY);
+		//m_pCamera->();
+	}
+
+	vector3 forward = m_pCamera->GetTarget() - m_pCamera->GetPosition();
+	vector3 upward = m_pCamera->GetUp();
+	vector3 sideRight = glm::normalize(glm::cross(upward, forward));
+	
 }
 //Keyboard
 void Application::ProcessKeyboard(void)
@@ -385,6 +398,63 @@ void Application::ProcessKeyboard(void)
 
 	if (fMultiplier)
 		fSpeed *= 5.0f;
+
+	// process keyboard movement here
+	vector3 upward = m_pCamera->GetUp();
+	vector3 position = m_pCamera->GetPosition();
+	vector3 forward = m_pCamera->GetTarget() - position;
+	vector3 sideRight = glm::normalize(glm::cross(upward, forward));
+
+	// left
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		position += sideRight * fSpeed;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	{
+		position += sideRight * fSpeed;
+	}
+
+	// right
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		position -= sideRight * fSpeed;
+
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	{
+		position -= sideRight * fSpeed;
+
+	}
+
+	// up
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) 
+	{
+		position += forward * fSpeed;
+	
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	{
+		position += forward * fSpeed;
+
+	}
+	
+	// down
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) 
+	{
+		position -= forward * fSpeed;
+		
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		position -= forward * fSpeed;
+
+	}
+
+	m_pCamera->SetPosition(position);
+	m_pCamera->SetTarget(position + forward);
+	m_pCamera->SetUp(upward);
+
 #pragma endregion
 }
 //Joystick
