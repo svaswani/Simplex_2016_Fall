@@ -78,19 +78,65 @@ vector3 MyRigidBody::GetHalfWidth(void) { return m_v3HalfWidth; }
 matrix4 MyRigidBody::GetModelMatrix(void) { return m_m4ToWorld; }
 void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 {
-	//to save some calculations if the model matrix is the same there is nothing to do here
+	// to save some calculations if the model matrix is the same there is nothing to do here
 	if (a_m4ModelMatrix == m_m4ToWorld)
 		return;
 
+	// assign the model matrix
 	m_m4ToWorld = a_m4ModelMatrix;
-	
-	//your code goes here---------------------
-	m_v3MinG = m_v3MinL;
-	m_v3MaxG = m_v3MaxL;
-	//----------------------------------------
 
-	//we calculate the distance between min and max vectors
+	// calculate the 8 corners of the cube
+	vector3 v3Corn[8];
+
+	// back square part
+	v3Corn[0] = m_v3MinL;
+	v3Corn[1] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
+	v3Corn[2] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z);
+	v3Corn[3] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z);
+
+	// front square part
+	v3Corn[4] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z);
+	v3Corn[5] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z);
+	v3Corn[6] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z);
+	v3Corn[7] = m_v3MaxL;
+
+	// put them in the world
+	for (uint uIndex = 0; uIndex < 8; ++uIndex)
+	{
+		v3Corn[uIndex] = vector3(m_m4ToWorld * vector4(v3Corn[uIndex], 1.0f));
+	}
+
+	// max and min become the first corners
+	m_v3MaxG = m_v3MinG = v3Corn[0];
+
+	// obtain new max and new min for the global box
+	for (uint i = 1; i < 8; ++i)
+	{
+		if (m_v3MaxG.x < v3Corn[i].x) {
+			m_v3MaxG.x = v3Corn[i].x;
+		}
+		else if (m_v3MinG.x > v3Corn[i].x) {
+			m_v3MinG.x = v3Corn[i].x;
+		}
+
+		if (m_v3MaxG.y < v3Corn[i].y) {
+			m_v3MaxG.y = v3Corn[i].y;
+		}
+		else if (m_v3MinG.y > v3Corn[i].y) {
+			m_v3MinG.y = v3Corn[i].y;
+		}
+
+		if (m_v3MaxG.z < v3Corn[i].z) {
+			m_v3MaxG.z = v3Corn[i].z;
+		}
+		else if (m_v3MinG.z > v3Corn[i].z) {
+			m_v3MinG.z = v3Corn[i].z;
+		}
+	}
+
+	// calculate the distance between min and max vectors
 	m_v3ARBBSize = m_v3MaxG - m_v3MinG;
+
 }
 //The big 3
 MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
