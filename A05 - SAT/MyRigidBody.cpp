@@ -285,8 +285,114 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	find a separating axis you need to return 0, there is an enum in
 	Simplex that might help you [eSATResults] feel free to use it.
 	(eSATResults::SAT_NONE has a value of 0)
+
 	*/
 
-	//there is no axis test that separates this two objects
+	// project the minimum and maximum of each object onto an axis
+	float myMinProjection = glm::dot(m_v3MinG, vector3(0.0f, 1.0f, 0.0f));
+	float myMaxProjection = glm::dot(vector3(0.0f, 1.0f, 0.0f), m_v3MaxG);
+	float otherMaxProjection = glm::dot(a_pOther->m_v3MaxG, vector3(0.0f, 1.0f, 0.0f));
+	float otherMinProjection = glm::dot(a_pOther->m_v3MinG, vector3(0.0f, 1.0f, 0.0f));
+
+	m_pMeshMngr->PrintLine("Maximum projection: " + std::to_string(myMaxProjection));
+	m_pMeshMngr->PrintLine("Minimum projection: " + std::to_string(myMinProjection));
+	m_pMeshMngr->PrintLine("Other maximum projection: " + std::to_string(otherMaxProjection));
+	m_pMeshMngr->PrintLine("Other minimum projection: " + std::to_string(otherMinProjection));
+
+
+	// collision checks
+	return (otherMaxProjection < myMinProjection || myMaxProjection < otherMinProjection);
+
+	// help from the book in the GDD library
+
+	float ra, rb;
+
+	vector3 v3_Rotate[3] = {
+		vector3(m_m4ToWorld[0][0], m_m4ToWorld[0][1], m_m4ToWorld[0][2]),
+		vector3(m_m4ToWorld[1][0], m_m4ToWorld[1][1], m_m4ToWorld[1][2]),
+		vector3(m_m4ToWorld[2][0], m_m4ToWorld[2][1], m_m4ToWorld[2][2])
+	};
+
+	vector3 v3_absolute[3];
+
+	// rotation matrix expressing b in a
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+
+			v3_Rotate[i][j] = glm::dot(m_v3LocalAxis[i], a_pOther->m_v3LocalAxis[j]);
+		}
+	}
+
+	// find a translation vector 
+	vector3 t = m_v3Center - a_pOther->m_v3Center;
+
+	t = vector3(glm::dot(t, v3_Rotate[0]), glm::dot(t, v3_Rotate[1]), glm::dot(t, v3_Rotate[2]));
+
+	// absolute rotation
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			v3_absolute[i][j] = glm::abs(v3_Rotate[i][j]) + FLT_EPSILON;
+		}
+	}
+
+	// testing the axis
+	for (int i = 0; i < 3; i++) {
+		ra = m_v3Center[i];
+		rb = a_pOther->m_v3Center[0] * v3_absolute[i][0] + a_pOther->m_v3Center[1] * v3_absolute[i][1] + a_pOther->m_v3Center[2] * v3_absolute[i][2];
+		if (glm::abs(t[i]) > ra + rb)
+			return 0;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		rb = a_pOther->m_v3Center[i];
+		rb = m_v3Center[0] * v3_absolute[i][0] + m_v3Center[1] * v3_absolute[i][1] + m_v3Center[2] * v3_absolute[i][2];
+		if (glm::abs(t[0] * v3_Rotate[0][i] + t[1] * v3_Rotate[1][i] + t[2] * v3_Rotate[2][i]) > ra + rb)
+			return 0;
+	}
+
+	ra = m_v3Center[1] * v3_absolute[2][0] + m_v3Center[2] * v3_absolute[1][0];
+	rb = a_pOther->m_v3Center[1] * v3_absolute[0][2] + a_pOther->m_v3Center[2] * v3_absolute[0][1];
+	if (glm::abs(t[2] * v3_Rotate[1][0] - t[1] * v3_Rotate[2][0]) > ra + rb)
+		return 0;
+
+	ra = m_v3Center[1] * v3_absolute[2][1] + m_v3Center[2] * v3_absolute[1][1];
+	rb = a_pOther->m_v3Center[0] * v3_absolute[0][2] + a_pOther->m_v3Center[2] * v3_absolute[0][0];
+	if (glm::abs(t[2] * v3_Rotate[1][1] - t[1] * v3_Rotate[2][1]) > ra + rb)
+		return 0;
+
+	ra = m_v3Center[1] * v3_absolute[2][2] + m_v3Center[2] * v3_absolute[1][2];
+	rb = a_pOther->m_v3Center[0] * v3_absolute[0][1] + a_pOther->m_v3Center[1] * v3_absolute[0][0];
+	if (glm::abs(t[2] * v3_Rotate[1][2] - t[1] * v3_Rotate[2][2]) > ra + rb)
+		return 0;
+
+	ra = m_v3Center[0] * v3_absolute[2][0] + m_v3Center[2] * v3_absolute[1][2];
+	rb = a_pOther->m_v3Center[1] * v3_absolute[1][2] + a_pOther->m_v3Center[2] * v3_absolute[1][1];
+	if (glm::abs(t[0] * v3_Rotate[2][0] - t[2] * v3_Rotate[0][0]) > ra + rb) return 0;
+
+	ra = m_v3Center[0] * v3_absolute[2][1] + m_v3Center[2] * v3_absolute[0][1];
+	rb = a_pOther->m_v3Center[0] * v3_absolute[1][2] + a_pOther->m_v3Center[2] * v3_absolute[1][0];
+	if (glm::abs(t[0] * v3_Rotate[2][1] - t[2] * v3_Rotate[0][1]) > ra + rb) return 0;
+
+	ra = m_v3Center[0] * v3_absolute[2][2] + m_v3Center[2] * v3_absolute[0][2];
+	rb = a_pOther->m_v3Center[0] * v3_absolute[1][1] + a_pOther->m_v3Center[1] * v3_absolute[1][0];
+	if (glm::abs(t[0] * v3_Rotate[2][2] - t[2] * v3_Rotate[0][2]) > ra + rb) return 0;
+
+	ra = m_v3Center[0] * v3_absolute[1][0] + m_v3Center[1] * v3_absolute[0][0];
+	rb = a_pOther->m_v3Center[1] * v3_absolute[2][2] + a_pOther->m_v3Center[2] * v3_absolute[2][1];
+	if (glm::abs(t[1] * v3_Rotate[0][0] - t[0] * v3_Rotate[1][0]) > ra + rb) return 0;
+
+	ra = m_v3Center[0] * v3_absolute[1][1] + m_v3Center[1] * v3_absolute[0][1];
+	rb = a_pOther->m_v3Center[0] * v3_absolute[2][2] + a_pOther->m_v3Center[2] * v3_absolute[2][0];
+	if (glm::abs(t[1] * v3_Rotate[0][1] - t[0] * v3_Rotate[1][1]) > ra + rb) return 0;
+
+	ra = m_v3Center[0] * v3_absolute[1][2] + m_v3Center[1] * v3_absolute[0][2];
+	rb = a_pOther->m_v3Center[0] * v3_absolute[2][1] + a_pOther->m_v3Center[1] * v3_absolute[2][0];
+	if (glm::abs(t[1] * v3_Rotate[0][2] - t[0] * v3_Rotate[1][2]) > ra + rb) return 0;
+
+	// no separating axis is found
+	// must be intersecting
+	return 1;
+
+	// in case there isn't an axis test that separates the objects
 	return eSATResults::SAT_NONE;
 }

@@ -38,6 +38,9 @@ class MyRigidBody
 
 	std::set<MyRigidBody*> m_CollidingRBSet; //set of rigid bodies this one is colliding with
 
+	vector3 m_v3LocalAxis = vector3(0.0f);
+
+
 public:
 	/*
 	Usage: Constructor
