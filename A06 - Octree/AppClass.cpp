@@ -1,4 +1,5 @@
 #include "AppClass.h"
+
 using namespace Simplex;
 void Application::InitVariables(void)
 {
@@ -30,6 +31,7 @@ void Application::InitVariables(void)
 		}
 	}
 	m_uOctantLevels = 1;
+	rootNode = new Octree(vector3(1.0f), vector3(3.0f));
 	m_pEntityMngr->Update();
 }
 void Application::Update(void)
@@ -56,6 +58,7 @@ void Application::Display(void)
 
 	//display octree
 	//m_pRoot->Display();
+	rootNode->DisplayOctree();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
