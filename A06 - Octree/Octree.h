@@ -3,16 +3,9 @@
 
 #include "Simplex\Mesh\Model.h"
 #include "Definitions.h"
-#include "AppClass.h"
 #include "MyRigidBody.h"
-#include "Main.h"
 #include "MyEntityManager.h"
 #include "Simplex\Simplex.h"
-
-#include "SFML\Window.hpp"
-#include "SFML\Graphics.hpp"
-#include "SFML\OpenGL.hpp"
-#include "SFML\Audio.hpp"
 
 
 namespace Simplex {
@@ -38,6 +31,7 @@ namespace Simplex {
 		std::vector<int> entityList;
 		bool active;
 		MyEntityManager* entityManager = nullptr;
+		MeshManager* m_pMeshMngr = nullptr;
 		static Octree* instance;
 	public:
 		Octree(vector3 center, vector3 size);

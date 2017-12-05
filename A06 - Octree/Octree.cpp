@@ -1,12 +1,15 @@
 #include "Octree.h"
+#include "MyEntityManager.h"
+#include "MyRigidBody.h"
 
 
 Simplex::Octree::Octree(vector3 center, vector3 size)
 {
-
-	// set Root node of tree
+	m_pMeshMngr = MeshManager::GetInstance();
+	// set root node of tree
 	rootNode = this;
-
+	entityManager = MyEntityManager::GetInstance();
+	//MyEntityManager* entityManager;
 	// get global center and entity count
 	maxV3 = minV3 = entityManager->GetRigidBody()->GetCenterGlobal();
 	entities = entityManager->GetEntityCount();
@@ -17,8 +20,8 @@ Simplex::Octree::Octree(vector3 center, vector3 size)
 		entityList.push_back(i);
 
 		// get min and max of entity
-		vector3 min = entityManager->GetRigidBody(i)->GetMinGlobal;
-		vector3 max = entityManager->GetRigidBody(i)->GetMaxGlobal;
+		vector3 min = entityManager->GetRigidBody(i)->GetMinGlobal();
+		vector3 max = entityManager->GetRigidBody(i)->GetMaxGlobal();
 
 		// set min and max of octree
 		if (min.x < minV3.x) minV3.x = min.x;
@@ -34,8 +37,6 @@ Simplex::Octree::Octree(vector3 center, vector3 size)
 
 	// size of octree
 	size = maxV3 - minV3;
-
-	
 }
 
 // collisions 
@@ -51,10 +52,12 @@ bool Simplex::Octree::IsColliding(uint a_uRBIndex) {
 	}
 }
 
+
+
 void Simplex::Octree::BuildOctree() {
 
 	// for each object create new octree element that is 1/4 the size of the original
-	// 8 objectren per tree node
+	// 8 objects per tree node
 	// for each corner of the node
 	object[0] = new Octree(centerV3 + vector3(-size.x / 4, size.y / 4, -size.z / 4), size / 2.f);
 	object[1] = new Octree(centerV3 + vector3(-size.x / 4, size.y / 4, size.z / 4), size / 2.f);
@@ -79,6 +82,19 @@ void Simplex::Octree::BuildOctree() {
 		// recursively subdivide again
 		object[i]->entities = object[i]->entityList.size();
 		object[i]->BuildOctree();
+	}
+}
+
+void Simplex::Octree::InsertObject(Node * tree, MyRigidBody * body)
+{
+}
+
+void Simplex::Octree::DisplayOctree()
+{
+	for (int i = 0; i < 8; i++) {
+		//m_pMeshMngr->AddWireCubeToRenderList(glm::translate(IDENTITY_M4, centerV3) * glm::scale(IDENTITY_M4, size), glm::rgbColor);
+
+		//object[i]->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorColliding);
 	}
 }
 
